@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import './login.less';
 import logo from './images/logo.jpg';
-import { Form, Icon, Input, Button } from 'antd';
-import {reqLogin} from '../../api'
-//可以定义组件, 必须写在import后面
-//const Item = Form.Item;
+import { Form, Icon, Input, Button, message} from 'antd';
+import { reqLogin } from '../../api';
+import memoryUtils from "../../utils/memoryUtils";
 
 // 登录路由组件
 class Login extends Component {
@@ -13,21 +12,23 @@ class Login extends Component {
         e.preventDefault();
 
         //对所有表单字段验证
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
             // 校验成功
             if (!err) {
-              const {username, password} = values;
-              reqLogin(username, password).then(
-                response => {
-                    console.log('调用成功', response.data);
+                const { username, password } = values;
+                const res = await reqLogin(username, password);
+                if (res.status===0) {   //登录成功
+                    message.success('登录成功');
+                    const user = res.data;
+                    memoryUtils.user = user;    //存储当前用户的user
+                    this.props.history.replace('/');
+                }else{
+                    message.error(res.msg);
                 }
-              ).catch(
-
-              )
-            }else{
+            } else {
                 console.log('error');
             }
-          });
+        });
 
         // const form = this.props.form;
         //获取表单项的输入数据
@@ -35,27 +36,25 @@ class Login extends Component {
         // console.log(values);
     }
 
-    
+
     /**
      *  @memberof Login
      *  自定义密码验证规则
      * 
      */
-    validatorPwd = (rule, value, callback) =>{
-        console.log('validatorPwd()', rule, value);
+    validatorPwd = (rule, value, callback) => {
+        
         if (!value) {
             callback('必须输入密码!');
-        }else if (value.length < 4) {
+        } else if (value.length < 4) {
             callback('密码不能小于4位!');
-        }else if (value.length > 12) {
+        } else if (value.length > 12) {
             callback('密码不能大于12位!');
-        }else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+        } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
             callback('密码必须是英文、数字或下划线!');
-        }else{
+        } else {
             callback()  //验证通过
         }
-        
-        //callback('xxxxx')   //验证失败, 并指定提示的文本
     }
 
     render() {
@@ -93,8 +92,8 @@ class Login extends Component {
                             {
                                 getFieldDecorator('password', {
                                     rules: [
-                                        { 
-                                            validator:this.validatorPwd
+                                        {
+                                            validator: this.validatorPwd
                                         }
                                     ],
                                 })(

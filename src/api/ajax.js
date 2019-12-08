@@ -2,6 +2,7 @@
  * 发送异步ajax请求的函数模块
  * 封装axios
  * 返回promise对象
+ * 统一处理异常信息
  */
 
 import axios from 'axios';
@@ -11,7 +12,7 @@ export default function ajax(url, data = {}, type = "GET") {
 
     return new Promise((resolve, reject) => {
         let promise;
-        if (type == 'GET') {
+        if (type === 'GET') {
             promise = axios.get(url, { params: data });
         } else {
             promise = axios.post(url, data);
