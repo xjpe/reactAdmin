@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import './login.less';
 import logo from './images/logo.jpg';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
-
+import { Form, Icon, Input, Button } from 'antd';
+import {reqLogin} from '../../api'
 //可以定义组件, 必须写在import后面
 //const Item = Form.Item;
 
@@ -11,10 +11,28 @@ class Login extends Component {
     handleSubmit = (e) => {
         //阻止默认行为
         e.preventDefault();
-        const form = this.props.form;
+
+        //对所有表单字段验证
+        this.props.form.validateFields((err, values) => {
+            // 校验成功
+            if (!err) {
+              const {username, password} = values;
+              reqLogin(username, password).then(
+                response => {
+                    console.log('调用成功', response.data);
+                }
+              ).catch(
+
+              )
+            }else{
+                console.log('error');
+            }
+          });
+
+        // const form = this.props.form;
         //获取表单项的输入数据
-        const values = form.getFieldsValue();
-        console.log(values);
+        // const values = form.getFieldsValue();
+        // console.log(values);
     }
 
     
@@ -27,11 +45,11 @@ class Login extends Component {
         console.log('validatorPwd()', rule, value);
         if (!value) {
             callback('必须输入密码!');
-        }else if (value.length < 5) {
+        }else if (value.length < 4) {
             callback('密码不能小于4位!');
-        }else if (value.length > 13) {
+        }else if (value.length > 12) {
             callback('密码不能大于12位!');
-        }else if (/^[a-zA-Z0-9_]+$/g.test(value)) {
+        }else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
             callback('密码必须是英文、数字或下划线!');
         }else{
             callback()  //验证通过
@@ -58,15 +76,15 @@ class Login extends Component {
                                 getFieldDecorator('username', {
                                     //声明式验证, 直接使用别人定义好的验证规则进行验证
                                     rules: [
-                                        { require: true, whitespace: true, message: '必须输入用户名!' },
+                                        { required: true, whitespace: true, message: '必须输入用户名!' },
                                         { min: 4, message: '用户名最少4位!' },
                                         { max: 12, message: '用户名最多12位!' },
-                                        { pattern: /^[a-zA-Z0-9_]+$/g, message: '用户名必须是英文、数字或下划线!' },
+                                        { pattern: /^[a-zA-Z0-9_]+$/, message: '用户名必须是英文、数字或下划线!' },
                                     ]
                                 })(
                                     <Input
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                                        placeholder="Username"
+                                        placeholder="用户名"
                                     />
                                 )
                             }
@@ -83,14 +101,14 @@ class Login extends Component {
                                     <Input
                                         prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         type="password"
-                                        placeholder="Password"
+                                        placeholder="密码"
                                     />,
                                 )
                             }
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit" className="login-form-button">
-                                Log in
+                                登录
                         </Button>
                         </Form.Item>
                     </Form>
