@@ -22,7 +22,6 @@ export default class Admin extends Component {
 
     render() {
         const user = memoryUtils.user;
-        console.log(user);
         if (!user || !user._id) {
             return <Redirect to="/login" />
         }
@@ -33,7 +32,7 @@ export default class Admin extends Component {
                 </Sider>
                 <Layout>
                     <Header>Header</Header>
-                    <Content style={{ backgroundColor: '#fff' }}>
+                    <Content style={{ margin:20, backgroundColor: '#fff' }}>
                         <Switch>
                             <Route path="/home" component={Home} />
                             <Route path="/category" component={Category} />
