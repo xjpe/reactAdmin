@@ -1,5 +1,5 @@
 import React ,{Component} from 'react';
-
+import './home.less';
 /**
  * 首页路由
  */
@@ -7,7 +7,7 @@ import React ,{Component} from 'react';
 export default class Home extends Component {
     render(){
         return (
-            <div>home</div>
+            <div className="home">欢迎使用巨像后台管理系统</div>
         )
     }
 }

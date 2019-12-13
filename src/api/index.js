@@ -1,22 +1,27 @@
 /**
  * 所有接口请求函数模块
  */
-import jsonp from 'jsonp';
 import ajax from './ajax';
 
-
 const BASE = '';
- //登录
- export const reqLogin = (username, password) => ajax(BASE + '/login', {username, password}, 'POST');
 
- //添加用户
- export const reqAddUser = (user)=>ajax(BASE + '/manage/user/add', user, 'POST');
+//高德天气API
+const GDURL = 'https://restapi.amap.com/v3/weather/weatherInfo';
 
-//jsonp请求的接口请求
-// export const reqWeather = (city) => {
-//     const url = `http://api.map.baudu.com/telematics/v3/weather?location=${city}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`;
-//     jsonp(url,{}, (err, data)=>{
-//         console.log(data);
-//     })
-// }
-// reqWeather('上海')
+//登录
+export const reqLogin = (username, password) => ajax(BASE + '/login', { username, password }, 'POST');
+
+//添加用户
+export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST');
+
+//查看天气
+export const reqWeather = (city,key) => ajax(GDURL, {city,key});
+
+//品类 : 获取一级/二级分类列表
+export const reqCategotys = (parentId) => ajax(BASE + '/manage/category/list', { parentId });
+
+//品类 : 添加分类
+export const reqAddCategoty = (categoryName, parentId) => ajax(BASE + '/manage/category/add', { categoryName, parentId }, 'POST');
+
+//品类 : 更新分类 (传值对象)
+export const reqUpdateCategoty = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', { categoryId, categoryName }, 'POST');

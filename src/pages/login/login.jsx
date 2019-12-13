@@ -9,7 +9,13 @@ import storageUtils from "../../utils/storageUtils";
 
 
 // 登录路由组件
+
 class Login extends Component {
+    /**
+     *点击登录
+     *
+     * @memberof Login
+     */
     handleSubmit = (e) => {
         //阻止默认行为
         e.preventDefault();
@@ -42,9 +48,9 @@ class Login extends Component {
 
 
     /**
-     *  @memberof Login
      *  自定义密码验证规则
-     * 
+     *  
+     *  @memberof Login
      */
     validatorPwd = (rule, value, callback) => {
         
