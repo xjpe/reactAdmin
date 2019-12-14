@@ -18,10 +18,10 @@ export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST'
 export const reqWeather = (city,key) => ajax(GDURL, {city,key});
 
 //品类 : 获取一级/二级分类列表
-export const reqCategotys = (parentId) => ajax(BASE + '/manage/category/list', { parentId });
+export const reqCategorys = (parentId) => ajax(BASE + '/manage/category/list', { parentId });
 
 //品类 : 添加分类
-export const reqAddCategoty = (categoryName, parentId) => ajax(BASE + '/manage/category/add', { categoryName, parentId }, 'POST');
+export const reqAddCategory = (categoryName, parentId) => ajax(BASE + '/manage/category/add', { categoryName, parentId }, 'POST');
 
 //品类 : 更新分类 (传值对象)
-export const reqUpdateCategoty = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', { categoryId, categoryName }, 'POST');
+export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', { categoryId, categoryName }, 'POST');
