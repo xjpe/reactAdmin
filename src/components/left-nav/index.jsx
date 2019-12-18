@@ -116,7 +116,7 @@ class leftNav extends Component {
 
                 <Link to="/" className="left-nav-header">
                     <img src={logo} alt="" />
-                    <h1>测试后台</h1>
+                    <h1>621621</h1>
                 </Link>
                 <Menu
                     selectedKeys={[path]}   //切换path时, 自动选中当前对应选项

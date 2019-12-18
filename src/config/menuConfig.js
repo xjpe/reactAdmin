@@ -10,7 +10,7 @@ const menuList = [
         icon:'appstore',
         children:[      //子分类
             {
-                title:'品类管理',    
+                title:'品牌管理',    
                 key:'/category',    
                 icon:'bars',
             },
