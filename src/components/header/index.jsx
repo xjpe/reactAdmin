@@ -1,144 +1,129 @@
-import React, { Component } from "react";
-import { withRouter } from 'react-router-dom';
-import { Modal } from 'antd';
+import React, {Component} from 'react'
+import {withRouter} from 'react-router-dom'
+import { Modal} from 'antd'
+import {connect} from 'react-redux'
+
+import LinkButton from '../link-button'
+import {reqWeather} from '../../api'
+import menuList from '../../config/menuConfig'
+import {formateDate} from '../../utils/dateUtils'
 import './index.less'
-import { reqWeather } from '../../api';
-import { formatDate } from '../../utils/dateUtils'
-import memoryUtyils from '../../utils/memoryUtils';
-import storageUtils from '../../utils/storageUtils';
-import weatherConfig from '../../config/weatherConfig';
-import menuList from '../../config/menuConfig';
-import LinkButton from '../link-button';
+import {logout} from '../../redux/actions'
 
-const { confirm } = Modal;
-
+/*
+左侧导航的组件
+ */
 class Header extends Component {
 
-    state = {
-        currentTime: formatDate(Date.now()),    //当前时间字符串
-        weather: '',    //天气文本 
-        dayPictureUrl: '',   //天气图片url
-        temperature: '',    //温度
-    }
+  state = {
+    currentTime: formateDate(Date.now()), // 当前时间字符串
+    dayPictureUrl: '', // 天气图片url
+    weather: '', // 天气的文本
+  }
 
-    /**
-     *获取时间
-     *
-     * @memberof Header
-     */
-    getTime = () => {
-        this.timer = setInterval(() => {
-            const currentTime = formatDate(Date.now());
-            this.setState({ currentTime });
-        }, 1000)
-    }
+  getTime = () => {
+    // 每隔1s获取当前时间, 并更新状态数据currentTime
+    this.intervalId = setInterval(() => {
+      const currentTime = formateDate(Date.now())
+      this.setState({currentTime})
+    }, 1000)
+  }
 
-    /**
-     *处理天气图片
-     *
-     * @memberof Header
-     */
-    manageWeatherImg = () => {
-        const { weather } = this.state;
-        let dayPictureUrl = '';
-        weatherConfig.forEach(item => {
-            if (item.name === weather) dayPictureUrl = item.url;
-        })
-        this.setState({ dayPictureUrl });
-    }
+  getWeather = async () => {
+    // 调用接口请求异步获取数据
+    const {dayPictureUrl, weather} = await reqWeather('北京')
+    // 更新状态
+    this.setState({dayPictureUrl, weather})
+  }
 
-    
-    /**
-     *获取天气
-     *
-     * @memberof Header
-     */
-    getWeather = async () => {
-        const KEY = '42ead96daf4425f9c7cb82f9cfefc480';
-        const res = await reqWeather('310000', KEY);
-        const { weather, temperature } = res.lives[0];
-        this.setState({ weather, temperature })
-    }
+  getTitle = () => {
+    // 得到当前请求路径
+    const path = this.props.location.pathname
+    let title
+    menuList.forEach(item => {
+      if (item.key===path) { // 如果当前item对象的key与path一样,item的title就是需要显示的title
+        title = item.title
+      } else if (item.children) {
+        // 在所有子item中查找匹配的
+        const cItem = item.children.find(cItem => path.indexOf(cItem.key)===0)
+        // 如果有值才说明有匹配的
+        if(cItem) {
+          // 取出它的title
+          title = cItem.title
+        }
+      }
+    })
+    return title
+  }
 
-    /**
-     *获取标题
-     *
-     * @returns
-     * @memberof Header
-     */
-    getTitle() {
-        const path = this.props.location.pathname;
-        let title;
-        menuList.forEach(item => {
-            if (item.key === path) {
-                title = item.title;
-            } else if (item.children) {
-                //在所有子item中查找匹配
-                const cItem = item.children.find(cItem => cItem.key === path);
-                if (cItem) title = cItem.title;
-            }
-        })
-        return title;
-    }
+  /*
+  退出登陆
+   */
+  logout = () => {
+    // 显示确认框
+    Modal.confirm({
+      content: '确定退出吗?',
+      onOk: () => {
+        console.log('OK', this)
+        this.props.logout()
+      }
+    })
+  }
 
-    /**
-     *退出登录
-     *
-     * @param {*} e
-     * @memberof Header
-     */
-    logOut(e) {
-        e.preventDefault();
-        confirm({
-            content: '确定退出吗',
-            onOk:() => {
-                storageUtils.removeUser();
-                memoryUtyils.user = {};
-                this.props.history.replace('/login');
-            }
-        });
-    }
-    /**
-     *componentDidMount: 装载完成，在render之后调用
-     *
-     * @memberof Header
-     */
-    async componentDidMount() {
-        this.getTime();
-        await this.getWeather();
-        this.manageWeatherImg();
-    }
+  /*
+  第一次render()之后执行一次
+  一般在此执行异步操作: 发ajax请求/启动定时器
+   */
+  componentDidMount () {
+    // 获取当前的时间
+    this.getTime()
+    // 获取当前天气
+    this.getWeather()
+  }
+  /*
+  // 不能这么做: 不会更新显示
+  componentWillMount () {
+    this.title = this.getTitle()
+  }*/
 
-    /**
-     *componentWillUnmount: 组件卸载之前调用
-     *
-     * @memberof Header
-     */
-    componentWillUnmount() {
-        clearInterval(this.timer);
-    }
+  /*
+  当前组件卸载之前调用
+   */
+  componentWillUnmount () {
+    // 清除定时器
+    clearInterval(this.intervalId)
+  }
 
-    render() {
-        const { currentTime, weather, dayPictureUrl, temperature } = this.state;
-        const username = memoryUtyils.user.username;
-        const title = this.getTitle();
-        return (
-            <div className="header">
-                <div className="header-top">
-                    <span>欢迎，{username}</span>
-                    <LinkButton onClick={this.logOut.bind(this)}>退出</LinkButton>
-                </div>
-                <div className="header-bottom">
-                    <div className="header-bottom-left">{title}</div>
-                    <div className="header-bottom-right">
-                        <span>{currentTime}</span>
-                        <img src={dayPictureUrl} alt="weather" />
-                        <span style={{ marginRight: 8 }}>{weather}</span>
-                        <span>{temperature}℃</span>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+
+  render() {
+
+    const {currentTime, dayPictureUrl, weather} = this.state
+
+    const username = this.props.user.username
+
+    // 得到当前需要显示的title
+    // const title = this.getTitle()
+    const title = this.props.headTitle
+    return (
+      <div className="header">
+        <div className="header-top">
+          <span>欢迎, {username}</span>
+          <LinkButton onClick={this.logout}>退出</LinkButton>
+        </div>
+        <div className="header-bottom">
+          <div className="header-bottom-left">{title}</div>
+          <div className="header-bottom-right">
+            <span>{currentTime}</span>
+            <img src={dayPictureUrl} alt="weather"/>
+            <span>{weather}</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
-export default withRouter(Header)
+
+export default connect(
+  state => ({headTitle: state.headTitle, user: state.user}),
+  {logout}
+)(withRouter(Header))
