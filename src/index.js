@@ -1,16 +1,13 @@
-/*
-入口js
- */
-import React from 'react'
-import ReactDOM from 'react-dom'
-import {Provider} from 'react-redux'
+// 入口文件
+import React from "react";
+import ReactDOM from "react-dom";
+// import "antd/dist/antd.css";
+import App from "./App";
+import memoryUtils from "./utils/memoryUtils";
+import storageUtils from "./utils/storageUtils";
 
-import store from './redux/store'
-import App from './App'
+const user = storageUtils.getUser();
+memoryUtils.user = user;
 
-// 将App组件标签渲染到index页面的div上
-ReactDOM.render((
-  <Provider store={store}>
-    <App />
-  </Provider>
-), document.getElementById('root'))
+//将App组件标签渲染到index.html的div上
+ReactDOM.render(<App />, document.getElementById('root'))
